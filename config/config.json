@@ -5,7 +5,8 @@
     "database": "story",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "operatorsAliases": false,
+    "token_secret": "0T0FtUKhPDx-nTHn_a6alAMf9egCsLTl9pA9tD36Z1hQM3i7oiiyAjCvRM1cHMqdEB5TrcWxcBCHSfT0-Yi03gdz_COOWGEK3DYUQiXXXHPHqDO-6DwOv04UgkemEZG7AJ9qxtGGIwLP4bm3ZtSvkZxoNlQrSeKL6u3uWNT8uIE"
   },
   "test": {
     "username": "root",

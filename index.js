@@ -2,12 +2,16 @@ const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const cors = require('cors')
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/config/config.json')[env];
 
 const authController = require('./controllers').auth;
+const projectsController = require('./controllers').projects;
 
 const User = require('./models').User;
+
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -44,3 +48,8 @@ app.get('/restricted', authenticateToken, function (req, res) {
 
 app.post('/login', authController.login);
 app.post('/register', authController.register);
+
+app.get('/projects', authenticateToken, projectsController.retrieve);
+app.post('/projects', authenticateToken, projectsController.create);
+app.post('/projects/:project_id/users/:email', authenticateToken, projectsController.addUser);
+app.delete('/projects/:project_id/users/:user_id', authenticateToken, projectsController.deleteUser);

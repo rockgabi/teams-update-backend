@@ -20,15 +20,19 @@ module.exports = {
         const data = Object.assign({}, req.body, { admin });
         const password = req.body.password && req.body.password != "" ? bcrypt.hashSync(req.body.password, 10) : "";
         data.password = password;
+        data.role = 'student';
 
+        let user;
         try {
-            const user = await User.create(data);
+            user = await User.create(data);
             user = user.get();
             delete user.password;
         } catch (error) {
-            return res.status(401).send({ error: 'invalid_input' });
+            console.log('Error ', error);
+            return res.status(500).send({ error: error });
         }
 
+        console.log('User ', user);
         const token = generateAccessToken(user);
 
         return res.status(201).send({ token, user });
