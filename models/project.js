@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
   Project.associate = function(models) {
     models.Project.belongsTo(models.User, { foreignKey: 'owner_id', as: 'owner' });
     models.Project.belongsToMany(models.User, { through: 'ProjectUsers', foreignKey: 'project_id', otherKey: 'user_id', as: 'users' });
+    models.Project.hasMany(models.Update, { foreignKey: 'project_id' });
   };
   return Project;
 };
