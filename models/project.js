@@ -3,7 +3,9 @@ module.exports = (sequelize, DataTypes) => {
   const Project = sequelize.define('Project', {
     name: DataTypes.STRING,
     owner_id: DataTypes.INTEGER,
-    public: DataTypes.BOOLEAN
+    public: DataTypes.BOOLEAN,
+    cycle_type: DataTypes.STRING,
+    color: DataTypes.STRING,
   }, {});
   Project.associate = function(models) {
     models.Project.belongsTo(models.User, { foreignKey: 'owner_id', as: 'owner' });

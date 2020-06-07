@@ -42,14 +42,16 @@ async function restrictAdmin(req, res, next) {
     next(); // pass the execution off to whatever request the client intended
 }
 
+// Routes
+app.post('/login', authController.login);
+app.post('/register', authController.register);
+
 app.get('/restricted', authenticateToken, function (req, res) {
     res.send('Restricted page');
 });
 
-app.post('/login', authController.login);
-app.post('/register', authController.register);
-
 app.get('/projects', authenticateToken, projectsController.retrieve);
 app.post('/projects', authenticateToken, projectsController.create);
+app.put('/projects/:project_id', authenticateToken, projectsController.update);
 app.post('/projects/:project_id/users/:email', authenticateToken, projectsController.addUser);
 app.delete('/projects/:project_id/users/:user_id', authenticateToken, projectsController.deleteUser);

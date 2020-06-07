@@ -36,6 +36,27 @@ module.exports = {
         return res.status(201).send(project);
     },
 
+    async update(req, res) {
+        let project;
+        let data = req.body;
+        const project_id = req.params.project_id;
+        data.owner_id = req.user.id;
+        delete data.id;
+
+        try {
+            project = await Project.update(data, {
+                where: {
+                    owner_id: req.user.id,
+                    id: project_id,
+                }
+            });
+        } catch (e) {
+            return res.status(500).send(e);
+        }
+
+        return res.status(200).send(project);
+    },
+
     async addUser(req, res) {
         let project = await Project.findByPk(req.params.project_id);
         let user = await User.findOne({
