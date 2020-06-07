@@ -4,7 +4,7 @@ const ProjectUsers = require('../models').ProjectUsers;
 
 module.exports = {
     async retrieve(req, res) {
-        const owned = !!req.query.owned;
+        const owned = req.query.owned && req.query.owned === 'true' ? true : false;
         let projects = [];
         if (owned) {
             projects = await Project.findAll({
@@ -14,9 +14,16 @@ module.exports = {
                 include: [
                     'owner', 'users'
                 ]
-            })
+            });
         } else {
-
+            const user = await User.findByPk(req.user.id, {
+                include: [{
+                    model: Project,
+                    as: 'projects',
+                    include: ['owner', 'users']
+                }]
+            });
+            projects = user.projects;
         }
 
         return res.status(200).send(projects);
