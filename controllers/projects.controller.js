@@ -29,6 +29,15 @@ module.exports = {
         return res.status(200).send(projects);
     },
 
+    async find(req, res) {
+        const project = await Project.findByPk(req.params.project_id);
+        if (project) {
+            return res.status(200).send(project);
+        } else {
+            return res.status(500).send({ error: 'Could not retrieve project' });
+        }
+    },
+
     async create(req, res) {
         let project;
         let data = req.body;

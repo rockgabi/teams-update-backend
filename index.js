@@ -8,6 +8,7 @@ const config = require(__dirname + '/config/config.json')[env];
 
 const authController = require('./controllers').auth;
 const projectsController = require('./controllers').projects;
+const updatesController = require('./controllers').updates;
 
 const User = require('./models').User;
 
@@ -52,6 +53,12 @@ app.get('/restricted', authenticateToken, function (req, res) {
 
 app.get('/projects', authenticateToken, projectsController.retrieve);
 app.post('/projects', authenticateToken, projectsController.create);
+app.get('/projects/:project_id', authenticateToken, projectsController.find);
 app.put('/projects/:project_id', authenticateToken, projectsController.update);
 app.post('/projects/:project_id/users/:email', authenticateToken, projectsController.addUser);
 app.delete('/projects/:project_id/users/:user_id', authenticateToken, projectsController.deleteUser);
+
+app.get('/projects/:project_id/updates', authenticateToken, updatesController.retrieve)
+app.post('/projects/:project_id/updates/', authenticateToken, updatesController.create);
+app.put('/projects/:project_id/updates/updates', authenticateToken, updatesController.update);
+app.delete('/projects/:project_id/updates/:update_id', authenticateToken, updatesController.delete);
