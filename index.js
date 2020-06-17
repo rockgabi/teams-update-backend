@@ -46,6 +46,7 @@ async function restrictAdmin(req, res, next) {
 // Routes
 app.post('/login', authController.login);
 app.post('/register', authController.register);
+app.get('/me', authenticateToken, authController.me);
 
 app.get('/restricted', authenticateToken, function (req, res) {
     res.send('Restricted page');

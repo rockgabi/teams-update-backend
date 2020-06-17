@@ -55,5 +55,10 @@ module.exports = {
 
         return res.status(200).send({ token, user });
     },
+
+    async me(req, res) {
+        const me = await User.findOne({ where: { id: req.user.id } });
+        return res.status(200).send(me);
+    }
     
 }
