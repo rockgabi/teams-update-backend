@@ -59,7 +59,8 @@ app.put('/projects/:project_id', authenticateToken, projectsController.update);
 app.post('/projects/:project_id/users/:email', authenticateToken, projectsController.addUser);
 app.delete('/projects/:project_id/users/:user_id', authenticateToken, projectsController.deleteUser);
 
-app.get('/projects/:project_id/updates', authenticateToken, updatesController.retrieve)
-app.post('/projects/:project_id/updates/', authenticateToken, updatesController.create);
-app.put('/projects/:project_id/updates/updates', authenticateToken, updatesController.update);
+app.get('/projects/:project_id/updates', authenticateToken, updatesController.retrieve);
+app.get('/projects/:project_id/updates/grouped', authenticateToken, updatesController.retrieveGrouped);
+app.post('/projects/:project_id/updates', authenticateToken, updatesController.create);
+app.put('/projects/:project_id/updates/update_id', authenticateToken, updatesController.update);
 app.delete('/projects/:project_id/updates/:update_id', authenticateToken, updatesController.delete);
