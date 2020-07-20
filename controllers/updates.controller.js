@@ -12,6 +12,29 @@ const _dayDifference = (date1, date2) => {
     return dayDifference;
 }
 
+const _fill = (start, end, step, data) => {
+    let subStart, subEnd;
+    const filled = [];
+
+    for (let i = 0; i < step; i++) {
+        subStart = new Date(start.getTime());
+        subStart.setDate(subStart.getDate() + i);
+        subEnd = new Date(subStart.getTime());
+        subEnd.setHours(23, 59, 59, 999);
+        if (subEnd < start) { break; }
+        const items = data.filter((item) => {
+            const createdAt = new Date(item.createdAt);
+            return (createdAt >= subStart && createdAt <= subEnd)
+        });
+        filled.push({
+            startDate: subStart.toISOString(),
+            endDate: subEnd.toISOString(),
+            data: items
+        });
+    }
+    return filled.reverse();
+}
+
 module.exports = {
 
     async retrieve(req, res) {
@@ -38,8 +61,8 @@ module.exports = {
     async retrieveGrouped(req, res) {
         const projectId = req.params.project_id;
         const project = await Project.findByPk(projectId, { include: ['users'] });
-        const page = req.query.page ? req.query.page : 1;
-        const limit = req.query.limit ? req.query.limit : 5;
+        const page = req.query.page ? parseInt(req.query.page) : 1;
+        const perPage = req.query.per_page ? parseInt(req.query.per_page) : 5;
 
         if (project) {
             const cycle = project.cycle_type;
@@ -51,34 +74,31 @@ module.exports = {
             let pageStartDate = null;
             let pageEndDate = null;
 
-            // TODO check permissions, also one update per day
-
-            // TODO Pagination for daily updates
+            // Pagination for daily updates
             if (cycle === 'daily') {
                 startDate.setHours(0, 0, 0, 0);
                 endDate.setHours(23, 59, 59, 999);
                 totalDays = Math.ceil(_dayDifference(startDate, endDate));
-                pages = Math.floor(totalDays / limit);
-                rest = totalDays % limit;
+                pages = Math.floor(totalDays / perPage);
+                rest = totalDays % perPage;
                 pages = rest > 0 ? pages+1 : pages;
 
-                pageStartDate = new Date(startDate.getTime());
-                pageStartDate.setDate(startDate.getDate() + (page - 1) * limit);
+                /* pageStartDate = new Date(startDate.getTime());
+                pageStartDate.setDate(startDate.getDate() + (page - 1) * perPage);
                 pageEndDate = new Date(pageStartDate.getTime());
-                pageEndDate.setDate(pageStartDate.getDate() + limit);
-                pageEndDate.setHours(23, 59, 59, 999);
-            } else {    // TODO Pagination for weekly updates
+                pageEndDate.setDate(pageEndDate.getDate() + perPage - 1);
+                pageEndDate.setHours(23, 59, 59, 999); */
+
+                pageEndDate = new Date(endDate.getTime());
+                pageEndDate.setDate(pageEndDate.getDate() - (page - 1) * perPage);
+                pageStartDate = new Date(pageEndDate.getTime());
+                pageStartDate.setDate(pageStartDate.getDate() - perPage + 1);
+                if (pageStartDate < startDate) { pageStartDate = startDate; }
+                pageStartDate.setHours(0, 0, 0, 0);
+            } else {
+                // TODO Pagination for weekly updates
 
             }
-
-            console.log('totalDays ', totalDays);
-            console.log('Pages ', pages);
-            console.log('Rest ', rest);
-            console.log('pageStartDate ', pageStartDate);
-            console.log('startDate ', startDate);
-            console.log('pageEndDate ', pageEndDate);
-            console.log('endDate ', endDate);
-
 
             const updates = await Update.findAll({
                 where: {
@@ -92,8 +112,16 @@ module.exports = {
                     ['createdAt', 'DESC']
                 ],
                 include: ['comments', 'likes', 'user', 'project']
-            })
-            return res.status(200).send(updates);
+            });
+
+            return res.status(200).send({
+                pagination: {
+                    total_pages: pages,
+                    page: page,
+                    per_page: perPage,
+                },
+                data: _fill(pageStartDate, pageEndDate, perPage, updates),
+            });
         }
         
         return res.status(200).send(projects);
